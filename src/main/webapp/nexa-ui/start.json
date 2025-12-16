@@ -1,0 +1,64 @@
+﻿{
+    "version" : "24.0.0.1",
+    "runtime" :
+    {
+        "target" :
+        {
+            "os" : "windows"
+        },
+        "framework" :
+        [    
+        "./nexacrolib/framework/Framework.js?nexaversion=24.0.0.600"
+        ],
+        "component" :
+        [    
+        "./nexacrolib/component/CompBase.js?nexaversion=24.0.0.600",
+        "./nexacrolib/component/ComComp.js?nexaversion=24.0.0.600",
+        "./nexacrolib/component/Grid.js?nexaversion=24.0.0.600",
+        "./nexacrolib/component/ListView.js?nexaversion=24.0.0.600",
+        "./nexacrolib/component/DeviceAPI.js?nexaversion=24.0.0.600",
+        "./nexacrolib/component/MobileComp.js?nexaversion=24.0.0.600"
+        ],
+        "environment" :
+        [    
+        {
+        "file":"./environment.xml.js"
+        }
+        ],
+        "screen" :
+        [    
+        {"id":"Desktop_screen","type":"desktop","themeid":"theme::blue"}
+        ],
+        "xadl" :
+        [
+        {
+        	"screenid":"Desktop_screen",
+        	"launch":"./Application_Desktop.xadl.js",
+        	"quickview":"./Application_Desktop.xadl.quickview.js",
+        	"form":[
+        				"./FrameBase/Form_Top.xfdl.js",
+        		"./FrameBase/Form_Left.xfdl.js",
+        		"./FrameBase/Form_Work.xfdl.js",
+        		"./FrameBase/Form_Bottom.xfdl.js"
+        	]
+        }
+        ],  
+        "protocol" :
+        {
+            "adaptors" :
+            []
+        },
+        "resource" :
+        {
+
+        },
+		"deploy" :
+        {
+
+        },
+        "userfont" :
+        [
+
+        ]
+    }
+}

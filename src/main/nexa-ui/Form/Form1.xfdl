@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="List" width="1280" height="720" titletext="New Form" onload="Form_onload">
+    <Layouts>
+      <Layout height="720" mobileorientation="landscape" width="1280">
+        <Div id="Div00" taborder="0" text="Div00" left="0" top="62" width="1080" height="408">
+          <Layouts>
+            <Layout>
+              <Grid id="Grid00" taborder="0" left="23" top="0" width="1037" height="400" binddataset="dsData" autosizingtype="none" autofittype="col">
+                <Formats>
+                  <Format id="default">
+                    <Columns>
+                      <Column size="80"/>
+                      <Column size="80"/>
+                      <Column size="80"/>
+                      <Column size="80"/>
+                      <Column size="80"/>
+                    </Columns>
+                    <Rows>
+                      <Row size="24" band="head"/>
+                      <Row size="24"/>
+                    </Rows>
+                    <Band id="head">
+                      <Cell text="EMP_NO"/>
+                      <Cell col="1" text="EMP_ID"/>
+                      <Cell col="2" text="NAME"/>
+                      <Cell col="3" text="BRT_DT"/>
+                      <Cell col="4" text="HP_NO"/>
+                    </Band>
+                    <Band id="body">
+                      <Cell text="bind:EMP_NO" textAlign="center" edittype="normal"/>
+                      <Cell col="1" text="bind:EMP_ID" textAlign="center" edittype="normal"/>
+                      <Cell col="2" text="bind:NAME" edittype="normal"/>
+                      <Cell col="3" text="bind:BRT_DT" textAlign="center" edittype="date" calendardateformat="yyyy-MM-dd"/>
+                      <Cell col="4" text="bind:HP_NO" textAlign="center" edittype="normal" displaytype="mask" maskeditformat="expr:dataset.getColumn(currow, &quot;HP_NO&quot;).length &gt;= 10 ? (dataset.getColumn(currow, &quot;HP_NO&quot;).substring(0,2) == '02' ? '@@-@@@@-@@@@' : (dataset.getColumn(currow, &quot;HP_NO&quot;).length == 11?'@@@-@@@@-@@@@':'@@@-@@@-@@@@' )) : '@@-@@@-@@@@'" maskedittype="string"/>
+                    </Band>
+                  </Format>
+                </Formats>
+              </Grid>
+            </Layout>
+          </Layouts>
+        </Div>
+        <Div id="divSearch" taborder="1" left="0" top="9" width="1080" height="53">
+          <Layouts>
+            <Layout>
+              <Button id="btnSearch" taborder="0" text="조회" left="941" top="13" width="119" height="25" onclick="divSearch_btnSearch_onclick"/>
+              <Combo id="cboSearch" taborder="1" left="33" top="13" width="125" height="25" value="ID" index="0" innerdataset="innerdataset" codecolumn="codecolumn" datacolumn="datacolumn" text="ID">
+                <Dataset id="innerdataset">
+                  <ColumnInfo>
+                    <Column id="codecolumn" size="256"/>
+                    <Column id="datacolumn" size="256"/>
+                  </ColumnInfo>
+                  <Rows>
+                    <Row>
+                      <Col id="codecolumn">ID</Col>
+                      <Col id="datacolumn">ID</Col>
+                    </Row>
+                    <Row>
+                      <Col id="codecolumn">NAME</Col>
+                      <Col id="datacolumn">NAME</Col>
+                    </Row>
+                    <Row>
+                      <Col id="codecolumn">DESCRIPTION</Col>
+                      <Col id="datacolumn">DESCRIPTION</Col>
+                    </Row>
+                    <Row>
+                      <Col id="codecolumn">USE_YN</Col>
+                      <Col id="datacolumn">USE_YN</Col>
+                    </Row>
+                    <Row>
+                      <Col id="codecolumn">REG_USER</Col>
+                      <Col id="datacolumn">REG_USER</Col>
+                    </Row>
+                  </Rows>
+                </Dataset>
+              </Combo>
+              <Edit id="edtSearch" taborder="2" left="186" top="13" width="160" height="25"/>
+            </Layout>
+          </Layouts>
+        </Div>
+        <Div id="divBtn" taborder="2" left="23" top="469" width="1037" height="69">
+          <Layouts>
+            <Layout>
+              <Button id="btnSave" taborder="0" text="등록" left="777" top="14" width="77" height="25" onclick="divBtn_btnSave_onclick"/>
+              <Button id="btnUpdate" taborder="1" text="저장" left="862" top="14" width="77" height="25" onclick="divBtn_btnUpdate_onclick"/>
+              <Button id="btnDelete" taborder="2" text="삭제" left="947" top="14" width="77" height="25" onclick="divBtn_btnDelete_onclick"/>
+            </Layout>
+          </Layouts>
+        </Div>
+      </Layout>
+    </Layouts>
+    <Script type="xscript5.1"><![CDATA[/****************************************************************************
+ * 화면번호: []
+ * 화면내용: []
+ * 
+ * =============================================================================
+ * 회원번호	회원이름	작성일자					작성내용
+ * =============================================================================
+ * 1230004		한일권		2025.12.10					최초작성
+ * =============================================================================
+****************************************************************************/
+
+/****************************************************************************
+ * Import Library
+****************************************************************************/
+
+/****************************************************************************
+ * Global Variable
+****************************************************************************/
+this.resultCount = "";
+
+/****************************************************************************
+ * Form Onload
+****************************************************************************/
+this.Form_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	// form onload 시 최초 조회
+	this.fnTransaction("svcGetData");
+};
+
+/****************************************************************************
+ * Call Back
+****************************************************************************/
+this.fn_callback = function(svcId, errCd, errMsg) {
+	if(errCd < 0) {
+		alert("서버 통신 실패: " + errMsg);
+	} else {
+		switch(svcId) {
+			case "svcGetData":
+				fnSearchSuccess();
+				break;
+
+			case "svcSaveData":
+				fnSaveSuccess();
+				break;
+		}
+	}
+};
+
+/****************************************************************************
+ * Transaction
+****************************************************************************/
+this.fnTransaction = function(svcId, dataSet) {
+
+	if(svcId == "svcGetData") {
+		this.dsData.clearData();
+		this.dsData.addRow(0);
+		this.transaction("svcGetData"
+						, "strURL::/edu/getData.do"
+						, "dsSearch=dsSearch"	// Parameter DataSet
+						, "dsData=dsData"		// Callback DataSet
+						, "userId='admin'"		// Parameter Value
+						, "fn_callback"   		// Callback
+						);
+	}
+	
+	if(svcId == "svcSaveData") {
+		this.transaction("svcSaveData"
+						, "strURL::/edu/saveData.do"
+						, "dsData=dsData:u"		// Parameter DataSet
+						, "cnt=resultCount"		
+						, ""		
+						, "fn_callback"   		// Callback
+						);
+	}
+}
+
+/****************************************************************************
+ * User Function
+****************************************************************************/
+function fnSearchSuccess() {
+	trace("조회 성공!");
+}
+
+function fnSaveSuccess() {
+	trace("저장 성공!");
+}
+
+/****************************************************************************
+ * Component
+****************************************************************************/
+this.divSearch_btnSearch_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	this.fnTransaction("svcGetData");
+};
+
+this.divBtn_btnSave_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	this.dsData.insertRow(0);
+};
+
+this.divBtn_btnUpdate_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	this.fnTransaction("svcSaveData");
+};
+
+this.divBtn_btnDelete_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	this.dsData.deleteRow(this.dsData.rowposition);
+};
+
+
+]]></Script>
+    <Objects>
+      <Dataset id="dsData">
+        <ColumnInfo>
+          <Column id="EMP_NO" type="STRING" size="256"/>
+          <Column id="EMP_ID" type="STRING" size="256"/>
+          <Column id="NAME" type="STRING" size="256"/>
+          <Column id="BRT_DT" type="STRING" size="256"/>
+          <Column id="HP_NO" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+      <Dataset id="dsSearch">
+        <ColumnInfo>
+          <Column id="ID" type="STRING" size="256"/>
+          <Column id="NAME" type="STRING" size="256"/>
+          <Column id="DESCRIPTION" type="STRING" size="256"/>
+          <Column id="USE_YN" type="STRING" size="256"/>
+          <Column id="REG_USER" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+    </Objects>
+  </Form>
+</FDL>

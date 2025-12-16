@@ -1,0 +1,81 @@
+-- 설치 참조 사이트
+https://docs.tobesoft.com/edu-nexacro-egov/64758130f0590a7b#017677f6a3f2a602
+
+-- 설치 가이드 및 예제
+https://www.youtube.com/watch?v=iBrcQ62fBRI&list=PL103FbwuueMmJRwoSMYS4kt9DgYZZr71P
+
+-- oracle 설치
+-- cmd에서 실행
+cd c:\{workspace name}\edu-egov\docker
+docker-compose up -d
+
+-- 설치 후 oracle ID 생성(docker-compose로 자동 생성이 안된다..)
+docker exec -it oracle-xe bash	-- cmd용
+sqlplus / as sysdba
+
+-- 현재 위치가 CDB$ROOT이면 PDB로 이동
+ALTER SESSION SET CONTAINER = XEPDB1;
+
+-- 계정 생성
+CREATE USER egov IDENTIFIED BY "egov123!"
+    DEFAULT TABLESPACE USERS
+    TEMPORARY TABLESPACE TEMP;
+
+-- 용량 부여
+ALTER USER egov QUOTA UNLIMITED ON USERS;
+
+-- 기본 권한 부여
+GRANT CREATE SESSION TO egov;
+GRANT CREATE TABLE TO egov;
+GRANT CREATE SEQUENCE TO egov;
+GRANT CREATE VIEW TO egov;
+GRANT CREATE PROCEDURE TO egov;
+
+-- 개발 시 편의를 위한 확장 권한
+-- (필요 없으면 주석 처리)
+--GRANT UNLIMITED TABLESPACE TO egov;
+
+-- 커밋
+COMMIT;
+
+-- 확인 (\은 ! 에러 방지용)
+sqlplus egov/egov123\!@//localhost:1521/XEPDB1
+
+-- 기본 테이블 생성
+CREATE TABLE MEMBER (
+    EMP_NO       VARCHAR2(6)       	NOT NULL,  	-- 회원번호
+    EMP_ID       VARCHAR2(30)    	NOT NULL,  	-- 회원ID
+    PWD			 VARCHAR2(30)			    ,  	-- PASSWORD
+    NAME         VARCHAR2(30)    	NOT NULL,  	-- 이름
+    BRT_DT       DATE,                       	-- 생일
+    HP_NO        VARCHAR2(11),                 	-- 핸드폰번호
+    AUT_CD       VARCHAR2(2),                  	-- 권한코드
+    REG_DT       DATE,                       	-- 입력날짜
+    REG_EMP_NO   VARCHAR2(6),                  	-- 입력회원번호
+    UPT_DT       DATE,                       	-- 수정날짜
+    UPT_EMP_NO   VARCHAR2(6),                  	-- 수정회원번호
+    CONSTRAINT PK_MEMBER PRIMARY KEY (EMP_NO)
+);
+
+-- root, egov ID 생성
+INSERT ALL
+INTO EGOV.MEMBER (
+    EMP_NO, EMP_ID, PWD, NAME, BRT_DT, HP_NO, AUT_CD, REG_DT, REG_EMP_NO, UPT_DT, UPT_EMP_NO
+)
+VALUES (
+    '000000', 'ROOT', 'ROOT', 'ROOT', SYSDATE, '0000000000', '00', SYSDATE, '000000', SYSDATE, '000000'
+)
+INTO EGOV.MEMBER (
+    EMP_NO, EMP_ID, PWD, NAME, BRT_DT, HP_NO, AUT_CD, REG_DT, REG_EMP_NO, UPT_DT, UPT_EMP_NO
+)
+VALUES (
+    '000001', 'EGOV', 'EGOV123!', 'EGOV', SYSDATE, '0000000000', '00', SYSDATE, '000000', SYSDATE, '000000'
+)
+SELECT * FROM dual
+;
+
+-- 커밋
+COMMIT;
+
+[주소]
+http://localhost:8080/edu-egov/nexa-ui/

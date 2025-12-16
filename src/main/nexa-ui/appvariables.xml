@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AppVariables version="2.0">
+  <Datasets>
+    <Dataset id="gdsData">
+      <ColumnInfo>
+        <Column id="EMP_NO" type="STRING" size="256"/>
+        <Column id="EMP_ID" type="STRING" size="256"/>
+        <Column id="NAME" type="STRING" size="256"/>
+        <Column id="BRT_DT" type="STRING" size="256"/>
+        <Column id="HP_NO" type="STRING" size="256"/>
+      </ColumnInfo>
+    </Dataset>
+  </Datasets>
+  <Variables/>
+  <DataObjects/>
+</AppVariables>

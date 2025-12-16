@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="Form_Work" width="1080" height="570" titletext="Form_Work" onload="Form_onload">
+    <Layouts>
+      <Layout width="1080" height="570" screenid="Desktop_screen"/>
+    </Layouts>
+    <Script type="xscript5.1"><![CDATA[/****************************************************************************
+ * 화면번호: []
+ * 화면내용: []
+ * 
+ * =============================================================================
+ * 회원번호	회원이름	작성일자					작성내용
+ * =============================================================================
+ * 1230004		한일권		2025.12.11					최초작성
+ * =============================================================================
+****************************************************************************/
+
+/****************************************************************************
+ * Import Library
+****************************************************************************/
+
+/****************************************************************************
+ * Global Variable
+****************************************************************************/
+this.isLogin = 0;
+
+/****************************************************************************
+ * Form Onload
+****************************************************************************/
+this.Form_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	// form onload 시 최초 조회
+	var app = nexacro.getApplication(); // Application 객체 얻기
+
+	if (!app.gIsLogin)
+	{
+		this.fnTransaction("svcSessionCheck");
+		
+	}
+};
+
+/****************************************************************************
+ * Call Back
+****************************************************************************/
+this.fn_callback = function(svcId, errCd, errMsg) {
+	if(errCd < 0) {
+		alert("서버 통신 실패: " + errMsg);
+	} else {
+		switch(svcId) {
+			case "svcSessionCheck":
+			
+				var app = nexacro.getApplication();
+				var workFrame = app.mainframe.AllFrameSet.MidFrameSet.WorkFrame;
+				
+				if(this.isLogin == 1){
+					app.gIsLogin = true;
+
+					if(!app.gdsUser) app.gdsUser = new Dataset();
+					app.gdsUser.copyData(this.dsUser);
+
+					
+					workFrame.set_formurl("FrameBase::Form_Work.xfdl");
+				} else {
+					workFrame.set_formurl("login::login.xfdl");
+				}
+				break;
+		}
+	}
+};
+
+/****************************************************************************
+ * Transaction
+****************************************************************************/
+this.fnTransaction = function(svcId, dataSet) {
+	if(svcId == "svcSessionCheck") {
+		this.transaction("svcSessionCheck"
+						, "strURL::/edu/sessionCheck.do"
+						, ""					// Parameter DataSet
+						, "dsUser=dsUser"		// Callback DataSet
+						, ""					
+						, "fn_callback"   		// Callback
+						);
+	}
+}
+
+/****************************************************************************
+ * User Function
+****************************************************************************/
+
+/****************************************************************************
+ * Component
+****************************************************************************/
+]]></Script>
+    <Objects>
+      <Dataset id="dsUser">
+        <ColumnInfo>
+          <Column id="EMP_NO" type="STRING" size="256"/>
+          <Column id="EMP_ID" type="STRING" size="256"/>
+          <Column id="NAME" type="STRING" size="256"/>
+          <Column id="BRT_DT" type="STRING" size="256"/>
+          <Column id="HP_NO" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+    </Objects>
+  </Form>
+</FDL>

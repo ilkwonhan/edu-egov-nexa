@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  oracle-xe:
+    image: gvenzl/oracle-xe:21
+    container_name: oracle-xe
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+    environment:
+      ORACLE_PASSWORD: "oracle"
+      ORACLE_DATABASE: "XE"
+      APP_USER: "appuser"
+      APP_USER_PASSWORD: "appuser123"
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+      - ./oracle/init:/opt/oracle/scripts/setup
+    restart: unless-stopped
+
+volumes:
+  oracle_data:
