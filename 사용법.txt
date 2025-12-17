@@ -79,3 +79,9 @@ COMMIT;
 
 [주소]
 http://localhost:8080/edu-egov/nexa-ui/
+로그인 ID는 ROOT/ ROOT , EGOV/ EGOV123!
+
+[넥사크로]
+설치 후
+C:\workspace-egov\edu-egov-nexa\src\main\nexa-ui\nexa-ui.xprj
+파일을 선택하면 넥사크로로 열 수 있다.

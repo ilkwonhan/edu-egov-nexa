@@ -9,6 +9,30 @@
       <Script rule_version="1.02"/>
       <GeneratorInfo rule_version="1.3"/>
     </Rule>
-    <Info project="C:\workspace-egov\edu-egov-nexa\src\main\nexa-ui\" generated="C:\workspace-egov\edu-egov-nexa\src\main\webapp\nexa-ui\"><File url="environment.xml" checksum="20251212142754" errormsg=""/><File url="typedefinition.xml" checksum="20251216124338" errormsg=""/><File url="appvariables.xml" checksum="20251215142458" errormsg=""/><File url="_resource_\_theme_\blue\theme.xcss" checksum="20251212142754" errormsg=""/><File url="C:\Program Files (x86)\TOBESOFT\Nexacro N\SDK\24.0.0\nexacrolib\framework\Framework.json" checksum="20250225093538" errormsg=""/><File url="C:\Program Files (x86)\TOBESOFT\Nexacro N\SDK\24.0.0\nexacrolib\resources\Resource.json" checksum="20250225093538" errormsg=""/><File url="C:\Program Files (x86)\TOBESOFT\Nexacro N\SDK\24.0.0\nexacrolib\component\CompBase.json" checksum="20250225093534" errormsg=""/><File url="C:\Program Files (x86)\TOBESOFT\Nexacro N\SDK\24.0.0\nexacrolib\component\ComComp.json" checksum="20250225093532" errormsg=""/><File url="C:\Program Files (x86)\TOBESOFT\Nexacro N\SDK\24.0.0\nexacrolib\component\Grid.json" checksum="20250225093534" errormsg=""/><File url="C:\Program Files (x86)\TOBESOFT\Nexacro N\SDK\24.0.0\nexacrolib\component\ListView.json" checksum="20250225093538" errormsg=""/><File url="C:\Program Files (x86)\TOBESOFT\Nexacro N\SDK\24.0.0\nexacrolib\component\DeviceAPI.json" checksum="20250225093534" errormsg=""/><File url="C:\Program Files (x86)\TOBESOFT\Nexacro N\SDK\24.0.0\nexacrolib\component\MobileComp.json" checksum="20250225093540" errormsg=""/><File url="Application_Desktop.xadl" checksum="20251212142754" errormsg=""/><File url="FrameBase\Form_Bottom.xfdl" checksum="20251212142754" errormsg=""/><File url="FrameBase\Form_Left.xfdl" checksum="20251212142754" errormsg=""/><File url="FrameBase\Form_Top.xfdl" checksum="20251215171606" errormsg=""/><File url="FrameBase\Form_Work.xfdl" checksum="20251216124343" errormsg=""/><File url="Form\Form1.xfdl" checksum="20251216130117" errormsg=""/><File url="Form\Form2.xfdl" checksum="20251212142754" errormsg=""/><File url="com\login\login.xfdl" checksum="20251216124448" errormsg=""/><File url="Default\Default.xfdl" checksum="20251212155403" errormsg=""/><File url="common\base.xfdl" checksum="20251212142754" errormsg=""/><File url="common\common.xjs" checksum="20251212142754" errormsg=""/></Info>
+    <Info project="C:\workspace-egov\edu-egov-nexa\src\main\nexa-ui\" generated="C:\workspace-egov\edu-egov-nexa\src\main\webapp\nexa-ui\">
+      <File url="environment.xml" checksum="20251216133433" errormsg=""/>
+      <File url="typedefinition.xml" checksum="20251216133433" errormsg=""/>
+      <File url="appvariables.xml" checksum="20251216133433" errormsg=""/>
+      <File url="_resource_\_theme_\blue\theme.xcss" checksum="20251216133433" errormsg=""/>
+      <File url="C:\Program Files (x86)\TOBESOFT\Nexacro N\SDK\24.0.0\nexacrolib\framework\Framework.json" checksum="20250225093538" errormsg=""/>
+      <File url="C:\Program Files (x86)\TOBESOFT\Nexacro N\SDK\24.0.0\nexacrolib\resources\Resource.json" checksum="20250225093538" errormsg=""/>
+      <File url="C:\Program Files (x86)\TOBESOFT\Nexacro N\SDK\24.0.0\nexacrolib\component\CompBase.json" checksum="20250225093534" errormsg=""/>
+      <File url="C:\Program Files (x86)\TOBESOFT\Nexacro N\SDK\24.0.0\nexacrolib\component\ComComp.json" checksum="20250225093532" errormsg=""/>
+      <File url="C:\Program Files (x86)\TOBESOFT\Nexacro N\SDK\24.0.0\nexacrolib\component\Grid.json" checksum="20250225093534" errormsg=""/>
+      <File url="C:\Program Files (x86)\TOBESOFT\Nexacro N\SDK\24.0.0\nexacrolib\component\ListView.json" checksum="20250225093538" errormsg=""/>
+      <File url="C:\Program Files (x86)\TOBESOFT\Nexacro N\SDK\24.0.0\nexacrolib\component\DeviceAPI.json" checksum="20250225093534" errormsg=""/>
+      <File url="C:\Program Files (x86)\TOBESOFT\Nexacro N\SDK\24.0.0\nexacrolib\component\MobileComp.json" checksum="20250225093540" errormsg=""/>
+      <File url="Application_Desktop.xadl" checksum="20251212142754" errormsg=""/>
+      <File url="FrameBase\Form_Bottom.xfdl" checksum="20251212142754" errormsg=""/>
+      <File url="FrameBase\Form_Left.xfdl" checksum="20251212142754" errormsg=""/>
+      <File url="FrameBase\Form_Top.xfdl" checksum="20251215171606" errormsg=""/>
+      <File url="FrameBase\Form_Work.xfdl" checksum="20251216124343" errormsg=""/>
+      <File url="Form\Form1.xfdl" checksum="20251216130117" errormsg=""/>
+      <File url="Form\Form2.xfdl" checksum="20251212142754" errormsg=""/>
+      <File url="com\login\login.xfdl" checksum="20251216124448" errormsg=""/>
+      <File url="Default\Default.xfdl" checksum="20251212155403" errormsg=""/>
+      <File url="common\base.xfdl" checksum="20251212142754" errormsg=""/>
+      <File url="common\common.xjs" checksum="20251212142754" errormsg=""/>
+    </Info>
   </GenInfo>
 </root>
