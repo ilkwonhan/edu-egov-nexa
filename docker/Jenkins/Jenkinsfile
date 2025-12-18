@@ -10,13 +10,14 @@ pipeline {
         stage('Git Pull') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/ilkwonhan/edu-egov-nexa.git'
+                    url: 'https://github.com/ilkwonhan/edu-egov-nexa.git',
+                    credentialsId: 'Deploy'   // 🔑 GitHub용
             }
         }
 
         stage('Deploy to Linux Server') {
             steps {
-                sshagent(['linux-server-ssh']) {
+                sshagent(['deploy']) {       // 🔐 SSH용 (소문자!)
                     sh '''
                     ssh -o StrictHostKeyChecking=no deploy@linux-server "
                         mkdir -p ${DEPLOY_DIR}
