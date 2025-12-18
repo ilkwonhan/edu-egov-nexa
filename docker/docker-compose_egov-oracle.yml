@@ -17,27 +17,5 @@ services:
       - ./oracle/init:/opt/oracle/scripts/setup
     restart: unless-stopped
 
-  linux-server:
-    build: ./linux
-    container_name: linux-server
-    ports:
-      - "2222:22"
-    volumes:
-      - app_data:/app
-
-  jenkins:
-    build: ./jenkins
-    container_name: jenkins
-    ports:
-      - "8081:8080"
-      - "50000:50000"
-    volumes:
-      - jenkins_home:/var/jenkins_home
-    depends_on:
-      - oracle-xe
-      - linux-server
-
 volumes:
   oracle_data:
-  jenkins_home:
-  app_data:

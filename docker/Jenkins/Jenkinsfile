@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+
+    environment {
+        DEPLOY_DIR = "/app"
+    }
+
+    stages {
+
+        stage('Git Pull') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/ilkwonhan/edu-egov-nexa.git'
+            }
+        }
+
+        stage('Deploy to Linux Server') {
+            steps {
+                sshagent(['linux-server-ssh']) {
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no deploy@linux-server "
+                        mkdir -p ${DEPLOY_DIR}
+                        rm -rf ${DEPLOY_DIR}/*
+                    "
+                    scp -r * deploy@linux-server:${DEPLOY_DIR}/
+                    ssh deploy@linux-server "
+                        chmod +x ${DEPLOY_DIR}/app.sh
+                        ${DEPLOY_DIR}/app.sh
+                    "
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Git pull & 배포 성공'
+        }
+        failure {
+            echo '❌ 배포 실패'
+        }
+    }
+}
