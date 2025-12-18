@@ -2,28 +2,56 @@ pipeline {
     agent any
 
     environment {
+        APP_NAME   = "edu-egov-nexa"
         DEPLOY_DIR = "/app"
+        JAR_NAME   = "edu-egov-nexa.jar"
+        PROFILE    = "prod"
     }
 
     stages {
 
-        stage('Git Pull') {
+        /* =========================
+         * 1. Git Checkout
+         * ========================= */
+        stage('Checkout') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/ilkwonhan/edu-egov-nexa.git',
-                    credentialsId: 'Deploy'   // 🔑 GitHub용
+                    credentialsId: 'Deploy',
+                    url: 'https://github.com/ilkwonhan/edu-egov-nexa.git'
             }
         }
 
-        stage('Deploy to Linux Server') {
+        /* =========================
+         * 2. Maven Build
+         * ========================= */
+        stage('Build') {
             steps {
-                sshagent(['deploy']) {       // 🔐 SSH용 (소문자!)
+                sh '''
+                    echo "🔨 Maven build 시작"
+                    mvn clean package -DskipTests
+                '''
+            }
+        }
+
+        /* =========================
+         * 3. Deploy to Linux Server
+         * ========================= */
+        stage('Deploy') {
+            steps {
+                sshagent(['deploy']) {
                     sh '''
+                    echo "🚀 서버 배포 시작"
+
+                    # 서버 디렉터리 준비
                     ssh -o StrictHostKeyChecking=no deploy@linux-server "
                         mkdir -p ${DEPLOY_DIR}
-                        rm -rf ${DEPLOY_DIR}/*
                     "
-                    scp -r * deploy@linux-server:${DEPLOY_DIR}/
+
+                    # JAR & 실행 스크립트 전송
+                    scp target/*.jar deploy@linux-server:${DEPLOY_DIR}/${JAR_NAME}
+                    scp app.sh deploy@linux-server:${DEPLOY_DIR}/app.sh
+
+                    # 서버에서 실행
                     ssh deploy@linux-server "
                         chmod +x ${DEPLOY_DIR}/app.sh
                         ${DEPLOY_DIR}/app.sh
@@ -36,10 +64,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Git pull & 배포 성공'
+            echo '✅ CI/CD 파이프라인 성공'
         }
         failure {
-            echo '❌ 배포 실패'
+            echo '❌ CI/CD 파이프라인 실패'
         }
     }
 }
