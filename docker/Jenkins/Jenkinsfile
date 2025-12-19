@@ -20,6 +20,7 @@ pipeline {
                 sh '''
                     echo "🔨 Maven build 시작"
                     mvn clean package -DskipTests
+                    echo "📦 target 디렉터리 확인"
                     ls -l target
                 '''
             }
@@ -31,9 +32,27 @@ pipeline {
                     sh '''
                         echo "🚀 서버 배포 시작"
 
-                        ssh -o StrictHostKeyChecking=no deploy@linux-server "
-                            mkdir -p /app
-                        "
+                        ssh -o StrictHostKeyChecking=no deploy@linux-server "mkdir -p /app"
 
                         scp target/*.{jar,war} deploy@linux-server:/app/app.jar
-                        scp app.sh deploy@
+                        scp app.sh deploy@linux-server:/app/app.sh
+
+                        ssh deploy@linux-server "
+                            chmod +x /app/app.sh
+                            /app/app.sh
+                        "
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ CI/CD 파이프라인 성공'
+        }
+        failure {
+            echo '❌ CI/CD 파이프라인 실패'
+        }
+    }
+}
