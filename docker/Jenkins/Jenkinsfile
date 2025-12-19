@@ -27,24 +27,23 @@ pipeline {
         }
 
         stage('Deploy') {
-            steps {
-                sshagent(['deploy']) {
-                    sh '''
-                        echo "🚀 서버 배포 시작"
-
-                        ssh -o StrictHostKeyChecking=no deploy@linux-server "mkdir -p /app"
-
-                        scp target/*.{jar,war} deploy@linux-server:/app/app.jar
-                        scp app.sh deploy@linux-server:/app/app.sh
-
-                        ssh deploy@linux-server "
-                            chmod +x /app/app.sh
-                            /app/app.sh
-                        "
-                    '''
-                }
-            }
-        }
+		    steps {
+		        sshagent(['deploy']) {
+		            sh '''
+		                echo "🚀 서버 배포 시작"
+		
+		                ssh -o StrictHostKeyChecking=no deploy@linux-server "mkdir -p /app"
+		
+		                scp target/*.war deploy@linux-server:/app/app.war
+		
+		                ssh deploy@linux-server "
+		                    chmod +x /app/app.sh
+		                    /app/app.sh
+		                "
+		            '''
+		        }
+		    }
+		}
     }
 
     post {
