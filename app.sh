@@ -1,63 +1,38 @@
 #!/bin/bash
 
-# =============================
-# 환경 설정
-# =============================
-TOMCAT_VERSION=9.0.82
-TOMCAT_DIR=/opt/tomcat
-APP_NAME=edu-egov
-WAR_FILE=target/edu-egov-1.0.0.war
-DEPLOY_USER=deploy
+APP_HOME="/app"
+JAR_NAME="edu-egov-nexa.jar"
+PROFILE="prod"
+LOG_DIR="$APP_HOME/logs"
 
-# =============================
-# 1️⃣ 필수 패키지 설치
-# =============================
-echo "🔧 필수 패키지 설치"
-sudo apt update
-sudo apt install -y openjdk-11-jdk maven wget tar
+echo "==============================="
+echo "🚀 배포 스크립트 시작"
+echo "시간: $(date)"
+echo "==============================="
 
-# =============================
-# 2️⃣ Tomcat 설치
-# =============================
-if [ ! -d "$TOMCAT_DIR" ]; then
-    echo "📦 Tomcat 설치"
-    wget https://dlcdn.apache.org/tomcat/tomcat-9/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz -O /tmp/tomcat.tar.gz
-    sudo mkdir -p $TOMCAT_DIR
-    sudo tar xzf /tmp/tomcat.tar.gz --strip-components=1 -C $TOMCAT_DIR
-    sudo chown -R $DEPLOY_USER:$DEPLOY_USER $TOMCAT_DIR
-    sudo chmod +x $TOMCAT_DIR/bin/*.sh
+cd $APP_HOME || exit 1
+mkdir -p $LOG_DIR
+
+# 기존 프로세스 종료
+PID=$(pgrep -f $JAR_NAME)
+if [ -n "$PID" ]; then
+  echo "🛑 기존 프로세스 종료 (PID: $PID)"
+  kill -15 $PID
+  sleep 5
 else
-    echo "✅ Tomcat 이미 설치됨"
+  echo "✅ 실행 중인 프로세스 없음"
 fi
 
-# =============================
-# 3️⃣ Maven 빌드
-# =============================
-echo "🔨 Maven build 시작"
-if mvn clean package -DskipTests; then
-    echo "✅ Maven 빌드 성공"
-else
-    echo "❌ Maven 빌드 실패"
-    exit 1
+# JAR 존재 확인
+if [ ! -f "$APP_HOME/$JAR_NAME" ]; then
+  echo "❌ JAR 파일이 존재하지 않습니다"
+  exit 1
 fi
 
-# =============================
-# 4️⃣ WAR 파일 배포
-# =============================
-if [ -f "$WAR_FILE" ]; then
-    echo "🚀 WAR 파일 배포 시작"
-    cp $WAR_FILE $TOMCAT_DIR/webapps/app.war
-else
-    echo "❌ JAR/WAR 파일이 존재하지 않습니다"
-    exit 1
-fi
+# 실행
+echo "▶ 애플리케이션 실행"
+nohup java -jar $APP_HOME/$JAR_NAME \
+  --spring.profiles.active=$PROFILE \
+  > $LOG_DIR/app.log 2>&1 &
 
-# =============================
-# 5️⃣ Tomcat 재시작
-# =============================
-echo "🔄 Tomcat 재시작"
-$TOMCAT_DIR/bin/shutdown.sh
-sleep 5
-$TOMCAT_DIR/bin/startup.sh
-
-echo "✅ 배포 완료"
+echo "✅ 배포 완료 (PID: $!)"
