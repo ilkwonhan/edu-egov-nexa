@@ -31,15 +31,17 @@ pipeline {
 		        sshagent(['deploy']) {
 		            sh '''
 		                echo "🚀 서버 배포 시작"
-		
+		                
 		                ssh -o StrictHostKeyChecking=no deploy@linux-server "mkdir -p /app"
-		
-		                scp target/*.war deploy@linux-server:/app/app.war
-		
-		                ssh deploy@linux-server "
-		                    chmod +x /app/app.sh
-		                    /app/app.sh
-		                "
+		                
+		                WAR_FILE=$(ls target/*.war | head -n 1)
+		                
+		                if [ -f "$WAR_FILE" ]; then
+		                    scp "$WAR_FILE" deploy@linux-server:/app/app.war
+		                else
+		                    echo "❌ WAR 파일이 존재하지 않습니다"
+		                    exit 1
+		                fi
 		            '''
 		        }
 		    }
