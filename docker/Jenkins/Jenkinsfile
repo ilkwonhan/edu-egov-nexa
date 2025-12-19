@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DEPLOY_DIR = "/app"
-        TOMCAT_HOME = "/opt/tomcat" // 서버의 Tomcat 설치 경로
+        TOMCAT_HOME = "/opt/tomcat"
     }
 
     stages {
@@ -32,33 +32,34 @@ pipeline {
                 sshagent(['deploy']) {
                     sh '''
                         echo "🚀 서버 배포 시작"
-                        
+
+                        # 원격 서버에 임시 디렉터리 생성
                         ssh -o StrictHostKeyChecking=no deploy@linux-server "mkdir -p ${DEPLOY_DIR}"
-                        
+
+                        # WAR 파일 확인
                         WAR_FILE=$(ls target/*.war | head -n 1)
-                        
-                        if [ -f "$WAR_FILE" ]; then
-                            echo "📦 WAR 파일 복사"
-                            scp "$WAR_FILE" deploy@linux-server:${DEPLOY_DIR}/app.war
-
-                            echo "⏹ Tomcat 종료"
-                            ssh deploy@linux-server "${TOMCAT_HOME}/bin/shutdown.sh || true"
-                            sleep 5
-
-                            echo "🧹 기존 앱 제거"
-                            ssh deploy@linux-server "rm -rf ${TOMCAT_HOME}/webapps/edu-egov*"
-
-                            echo "📦 WAR 파일 배치"
-                            ssh deploy@linux-server "cp ${DEPLOY_DIR}/app.war ${TOMCAT_HOME}/webapps/edu-egov.war"
-
-                            echo "▶ Tomcat 시작"
-                            ssh deploy@linux-server "${TOMCAT_HOME}/bin/startup.sh"
-
-                            echo "✅ 배포 완료! 접속 URL: http://linux-server:8080/edu-egov/"
-                        else
+                        if [ ! -f "$WAR_FILE" ]; then
                             echo "❌ WAR 파일이 존재하지 않습니다"
                             exit 1
                         fi
+
+                        # WAR 파일 복사
+                        scp "$WAR_FILE" deploy@linux-server:${DEPLOY_DIR}/app.war
+
+                        # 기존 앱 제거 및 Tomcat 재시작
+                        ssh deploy@linux-server << 'EOF'
+                            echo "🧹 기존 앱 제거"
+                            sudo rm -rf ${TOMCAT_HOME}/webapps/edu-egov*
+
+                            echo "📦 새로운 WAR 배포"
+                            sudo cp ${DEPLOY_DIR}/app.war ${TOMCAT_HOME}/webapps/edu-egov.war
+
+                            echo "🔄 Tomcat 재시작"
+                            sudo ${TOMCAT_HOME}/bin/shutdown.sh || true
+                            sudo ${TOMCAT_HOME}/bin/startup.sh
+                        EOF
+
+                        echo "✅ 배포 완료"
                     '''
                 }
             }
