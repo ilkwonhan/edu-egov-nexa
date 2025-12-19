@@ -47,19 +47,19 @@ pipeline {
                         scp "$WAR_FILE" deploy@linux-server:${DEPLOY_DIR}/app.war
 
                         # 기존 앱 제거 및 Tomcat 재시작
-                        ssh deploy@linux-server << 'EOF'
-                            echo "🧹 기존 앱 제거"
-                            sudo rm -rf ${TOMCAT_HOME}/webapps/edu-egov*
-
-                            echo "📦 새로운 WAR 배포"
-                            sudo cp ${DEPLOY_DIR}/app.war ${TOMCAT_HOME}/webapps/edu-egov.war
-
-                            echo "🔄 Tomcat 재시작"
-                            sudo ${TOMCAT_HOME}/bin/shutdown.sh || true
-                            sudo ${TOMCAT_HOME}/bin/startup.sh
-                        EOF
-
-                        echo "✅ 배포 완료"
+                        ssh deploy@linux-server << EOF
+						    echo "🧹 기존 앱 제거"
+						    sudo rm -rf ${TOMCAT_HOME}/webapps/edu-egov*
+						
+						    echo "📦 새로운 WAR 배포"
+						    sudo cp ${DEPLOY_DIR}/app.war ${TOMCAT_HOME}/webapps/edu-egov.war
+						
+						    echo "🔄 Tomcat 재시작"
+						    sudo ${TOMCAT_HOME}/bin/shutdown.sh || true
+						    sudo ${TOMCAT_HOME}/bin/startup.sh
+						
+						    echo "✅ 배포 완료"
+						EOF
                     '''
                 }
             }
