@@ -1,73 +1,22 @@
-pipeline {
-    agent any
+stage('Deploy') {
+    steps {
+        sshagent(['deploy']) {
+            sh '''
+            echo "🚀 서버 배포 시작"
 
-    environment {
-        APP_NAME   = "edu-egov-nexa"
-        DEPLOY_DIR = "/app"
-        JAR_NAME   = "edu-egov-nexa.jar"
-        PROFILE    = "prod"
-    }
+            ssh -o StrictHostKeyChecking=no deploy@linux-server "
+                mkdir -p /app
+            "
 
-    stages {
+            scp target/*.{jar,war} deploy@linux-server:/app/app.jar
 
-        /* =========================
-         * 1. Git Checkout
-         * ========================= */
-        stage('Checkout') {
-            steps {
-                git branch: 'main',
-                    credentialsId: 'Deploy',
-                    url: 'https://github.com/ilkwonhan/edu-egov-nexa.git'
-            }
-        }
+            scp app.sh deploy@linux-server:/app/app.sh
 
-        /* =========================
-         * 2. Maven Build
-         * ========================= */
-        stage('Build') {
-            steps {
-                sh '''
-                    echo "🔨 Maven build 시작"
-                    mvn clean package -DskipTests
-                '''
-            }
-        }
-
-        /* =========================
-         * 3. Deploy to Linux Server
-         * ========================= */
-        stage('Deploy') {
-            steps {
-                sshagent(['deploy']) {
-                    sh '''
-                    echo "🚀 서버 배포 시작"
-
-                    # 서버 디렉터리 준비
-                    ssh -o StrictHostKeyChecking=no deploy@linux-server "
-                        mkdir -p ${DEPLOY_DIR}
-                    "
-
-                    # JAR & 실행 스크립트 전송
-                    scp target/*.jar deploy@linux-server:${DEPLOY_DIR}/${JAR_NAME}
-                    scp app.sh deploy@linux-server:${DEPLOY_DIR}/app.sh
-
-                    # 서버에서 실행
-                    ssh deploy@linux-server "
-                        chmod +x ${DEPLOY_DIR}/app.sh
-                        ${DEPLOY_DIR}/app.sh
-                    "
-                    '''
-                }
-            }
-        }
-    }
-
-    post {
-        success {
-            echo '✅ CI/CD 파이프라인 성공'
-        }
-        failure {
-            echo '❌ CI/CD 파이프라인 실패'
+            ssh deploy@linux-server "
+                chmod +x /app/app.sh
+                /app/app.sh
+            "
+            '''
         }
     }
 }
