@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DEPLOY_DIR = "/app"
+        TOMCAT_HOME = "/opt/tomcat" // 서버의 Tomcat 설치 경로
     }
 
     stages {
@@ -27,25 +28,41 @@ pipeline {
         }
 
         stage('Deploy') {
-		    steps {
-		        sshagent(['deploy']) {
-		            sh '''
-		                echo "🚀 서버 배포 시작"
-		                
-		                ssh -o StrictHostKeyChecking=no deploy@linux-server "mkdir -p /app"
-		                
-		                WAR_FILE=$(ls target/*.war | head -n 1)
-		                
-		                if [ -f "$WAR_FILE" ]; then
-		                    scp "$WAR_FILE" deploy@linux-server:/app/app.war
-		                else
-		                    echo "❌ WAR 파일이 존재하지 않습니다"
-		                    exit 1
-		                fi
-		            '''
-		        }
-		    }
-		}
+            steps {
+                sshagent(['deploy']) {
+                    sh '''
+                        echo "🚀 서버 배포 시작"
+                        
+                        ssh -o StrictHostKeyChecking=no deploy@linux-server "mkdir -p ${DEPLOY_DIR}"
+                        
+                        WAR_FILE=$(ls target/*.war | head -n 1)
+                        
+                        if [ -f "$WAR_FILE" ]; then
+                            echo "📦 WAR 파일 복사"
+                            scp "$WAR_FILE" deploy@linux-server:${DEPLOY_DIR}/app.war
+
+                            echo "⏹ Tomcat 종료"
+                            ssh deploy@linux-server "${TOMCAT_HOME}/bin/shutdown.sh || true"
+                            sleep 5
+
+                            echo "🧹 기존 앱 제거"
+                            ssh deploy@linux-server "rm -rf ${TOMCAT_HOME}/webapps/edu-egov*"
+
+                            echo "📦 WAR 파일 배치"
+                            ssh deploy@linux-server "cp ${DEPLOY_DIR}/app.war ${TOMCAT_HOME}/webapps/edu-egov.war"
+
+                            echo "▶ Tomcat 시작"
+                            ssh deploy@linux-server "${TOMCAT_HOME}/bin/startup.sh"
+
+                            echo "✅ 배포 완료! 접속 URL: http://linux-server:8080/edu-egov/"
+                        else
+                            echo "❌ WAR 파일이 존재하지 않습니다"
+                            exit 1
+                        fi
+                    '''
+                }
+            }
+        }
     }
 
     post {
