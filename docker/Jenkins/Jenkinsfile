@@ -1,22 +1,39 @@
-stage('Deploy') {
-    steps {
-        sshagent(['deploy']) {
-            sh '''
-            echo "🚀 서버 배포 시작"
+pipeline {
+    agent any
 
-            ssh -o StrictHostKeyChecking=no deploy@linux-server "
-                mkdir -p /app
-            "
-
-            scp target/*.{jar,war} deploy@linux-server:/app/app.jar
-
-            scp app.sh deploy@linux-server:/app/app.sh
-
-            ssh deploy@linux-server "
-                chmod +x /app/app.sh
-                /app/app.sh
-            "
-            '''
-        }
+    environment {
+        DEPLOY_DIR = "/app"
     }
-}
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    credentialsId: 'Deploy',
+                    url: 'https://github.com/ilkwonhan/edu-egov-nexa.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''
+                    echo "🔨 Maven build 시작"
+                    mvn clean package -DskipTests
+                    ls -l target
+                '''
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sshagent(['deploy']) {
+                    sh '''
+                        echo "🚀 서버 배포 시작"
+
+                        ssh -o StrictHostKeyChecking=no deploy@linux-server "
+                            mkdir -p /app
+                        "
+
+                        scp target/*.{jar,war} deploy@linux-server:/app/app.jar
+                        scp app.sh deploy@
