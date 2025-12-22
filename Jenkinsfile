@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        REMOTE_SERVER = "192.168.1.61" // 서버 주소 또는 IP
+        REMOTE_SERVER = "linux-server" // 서버 주소 또는 IP
         REMOTE_USER = "deploy"
         DEPLOY_DIR = "/home/deploy/app" // deploy 계정 권한이 확실한 경로 권장
         TOMCAT_HOME = "/opt/tomcat"
@@ -42,7 +42,9 @@ pipeline {
                         # Tomcat 배포 (sudo 명령어가 필요하므로 Dockerfile의 NOPASSWD 설정이 중요)
                         ssh ${SSH_OPTS} ${REMOTE_USER}@${REMOTE_SERVER} "
                             sudo rm -rf ${TOMCAT_HOME}/webapps/edu-egov* && \
-                            sudo cp ${DEPLOY_DIR}/app.war ${TOMCAT_HOME}/webapps/edu-egov.war
+                            sudo cp ${DEPLOY_DIR}/app.war ${TOMCAT_HOME}/webapps/edu-egov.war && \
+                            sudo ${TOMCAT_HOME}/bin/shutdown.sh || true && \
+                            sudo ${TOMCAT_HOME}/bin/startup.sh
                         "
 
                         echo "✅ 배포 완료"
